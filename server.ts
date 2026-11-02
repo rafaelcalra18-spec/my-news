@@ -16,16 +16,15 @@
  * - Securing the Gemini 3.8 Flash API key server-side without leaking it to client code.
  */
 
+// Load .env first: imports run before the rest of this file, and geminiService reads the key on import.
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { SERVER_CONFIG } from './server/config.ts';
 import { logServerFunction } from './server/logger.ts';
 import { analyzeSetupSentence, refineSetupAnswers, generateStoryRelevance } from './server/geminiService.ts';
 import { getAllStoryMarkets } from './server/marketService.ts';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

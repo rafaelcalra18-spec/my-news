@@ -1,16 +1,16 @@
 # My news
 
-My news is a phone-first news app that follows each story over time. A story has a timeline of how it changed day by day, a line saying what changed since the last edition, and coverage from the outlets that reported it. When a Kalshi or Polymarket market exists for the story, the app shows its current odds and how they moved over the past week.
+My news is a phone-first news app that follows each story over time. A story has a timeline of how it changed day by day, a line saying what changed since the last edition, and coverage from the outlets that reported it. When a Kalshi or Polymarket market exists for the story, the app shows its odds and how they moved over the past week.
 
 At setup the reader describes what they follow in one sentence. Gemini turns that sentence into topics and asks a couple of follow-up questions.
 
-The app was built in Google AI Studio for a Gemini hackathon.
+The app was built in Google AI Studio for a Gemini hackathon. This repository keeps the demo as it was shown: the morning edition for Saturday 31 October 2026.
 
-## What is live and what is seeded
+## What is in the demo
 
-The 13 stories in `src/data/` are seed data. They were researched from real reporting before the demo, and they link to the outlets they came from. The app does not yet build a new edition by itself each morning.
+The 13 stories in `src/data/` were researched from real reporting before the demo, and they link to the outlets they came from. The app does not build a new edition by itself each morning.
 
-The market prices are live. The server fetches them from the public Kalshi and Polymarket APIs at `/api/markets` and caches them for five minutes. If a request fails, the app shows the price saved on 31 October and labels it as saved.
+The market prices are the ones Kalshi and Polymarket showed at 8am London time on 31 October, with one price per day back to 24 October. They are saved in `src/data/marketSnapshot.ts`, so the odds still match the stories after the markets have closed. `scripts/snapshot-markets.ts` rebuilds that file from the public APIs.
 
 Gemini runs on the server, so the API key never reaches the browser.
 
@@ -19,22 +19,22 @@ Gemini runs on the server, so the API key never reaches the browser.
 You need Node.js 22 and a Gemini API key.
 
 ```sh
-npm install --legacy-peer-deps
-GEMINI_API_KEY=your-key npm run dev
+npm install
+cp .env.example .env    # then put your key in .env
+npm run dev
 ```
 
 Then open http://localhost:3000.
 
-Plain `npm install` fails for now because the pinned `esbuild` version conflicts with Vite 8. The flag gets past it.
-
-Pass the key in the shell as shown. A key in a `.env` file is not picked up yet, because `server.ts` imports the Gemini service before it calls `dotenv.config()`. Without a key the app still runs, and setup falls back to a fixed answer.
+Without a key the app still runs, but setup falls back to a fixed answer.
 
 ## Layout
 
 - `server.ts` is the Express server and its API routes.
-- `server/` has the Gemini calls and the market fetcher.
+- `server/` has the Gemini calls and the market data service.
 - `src/components/` has the screens and cards.
-- `src/data/` has the seed stories, their timelines and the saved market prices.
+- `src/data/` has the seed stories, their timelines and the market snapshot.
+- `scripts/` has the script that saved the market prices.
 - `Design.md` is the design spec the app was built from.
 
 ## Next step

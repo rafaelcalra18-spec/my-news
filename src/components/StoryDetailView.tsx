@@ -27,6 +27,15 @@ import { StoryIndexBottomSheet } from './StoryIndexBottomSheet.tsx';
 import { getAppConfig } from '../config/appConfig.ts';
 import { logFunctionCall } from '../utils/logger.ts';
 
+/** Turns '2026-10-31' into 'Sat 31 Oct', the format the "What changed" line uses for updated stories. */
+function formatShortDate(isoDate: string): string {
+  const d = new Date(`${isoDate}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return isoDate;
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${days[d.getUTCDay()]} ${d.getUTCDate()} ${months[d.getUTCMonth()]}`;
+}
+
 interface StoryDetailViewProps {
   stories: Story[];
   initialStoryId: string;
@@ -344,9 +353,10 @@ export function StoryDetailView({
                 color: config.accentColorHex
               }}
             >
-              <span>What changed &middot; {activeStory.dateLastChanged}:</span>{' '}
+              <span>What changed &middot; {formatShortDate(activeStory.dateLastChanged)}:</span>{' '}
               <span className="text-stone-800 font-normal">
-                {activeStory.summary.split('.')[0]}.
+                {/* First sentence only: split at a full stop followed by a space, so "$2.1bn" stays whole */}
+                {activeStory.summary.split(/(?<=[.!?])\s+/)[0]}
               </span>
             </div>
           )}

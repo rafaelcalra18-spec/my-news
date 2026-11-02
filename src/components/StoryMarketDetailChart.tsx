@@ -151,6 +151,22 @@ export function StoryMarketDetailChart({
     return nodeTs >= minTime && nodeTs <= maxTime;
   });
 
+  // Decide which x-axis date labels fit. Walk from the right so "today" always keeps its label,
+  // and drop any label whose text would run into the one to its right.
+  // Text widths are estimates for 13px monospace in viewBox units.
+  const labelledNodeIds = new Set<string>();
+  let nextLabelLeft = Infinity;
+  for (const node of [...visibleTimelineNodes].sort((a, b) => b.date.localeCompare(a.date))) {
+    const x = getX(node.date);
+    const isToday = node.isToday || node.date === '2026-10-31';
+    const left = isToday ? x + 4 - 42 : x - 24;
+    const right = isToday ? x + 4 : x + 24;
+    if (right + 4 <= nextLabelLeft) {
+      labelledNodeIds.add(node.id);
+      nextLabelLeft = left;
+    }
+  }
+
   return (
     <section className="mb-6 pb-5 border-b border-stone-200">
       {/* Requirement 4: Buttons that switch between markets name the market, not the platform */}
@@ -350,6 +366,7 @@ export function StoryMarketDetailChart({
                   const x = getX(node.date);
                   const isToday = node.isToday || node.date === '2026-10-31';
                   const isSelected = inspectedEntry?.id === node.id;
+                  const showLabel = labelledNodeIds.has(node.id);
 
                   return (
                     <g
@@ -382,18 +399,21 @@ export function StoryMarketDetailChart({
                         className="transition-transform group-hover:scale-125"
                       />
 
-                      {/* Date tick & label inside chart box */}
-                      <text
-                        x={x}
-                        y={paddingTop + chartH + 18}
-                        textAnchor="middle"
-                        fontSize="13"
-                        fontFamily="monospace"
-                        fontWeight={isToday ? 'bold' : 'normal'}
-                        fill={isToday ? config.accentColorHex : '#57534e'}
-                      >
-                        {isToday ? 'today' : node.dateDisplay.replace(/^[A-Za-z]+\s+/, '')}
-                      </text>
+                      {/* Date tick & label inside chart box. "today" is right-aligned so it stays inside the box,
+                          and a label that would collide with the one to its right is left out (the dot stays). */}
+                      {showLabel && (
+                        <text
+                          x={isToday ? x + 4 : x}
+                          y={paddingTop + chartH + 18}
+                          textAnchor={isToday ? 'end' : 'middle'}
+                          fontSize="13"
+                          fontFamily="monospace"
+                          fontWeight={isToday ? 'bold' : 'normal'}
+                          fill={isToday ? config.accentColorHex : '#57534e'}
+                        >
+                          {isToday ? 'today' : node.dateDisplay.replace(/^[A-Za-z]+\s+/, '')}
+                        </text>
+                      )}
 
                       {/* Generous touch target */}
                       <rect
