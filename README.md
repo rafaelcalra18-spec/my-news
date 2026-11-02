@@ -40,3 +40,5 @@ Without a key the app still runs, but setup falls back to a fixed answer.
 ## Next step
 
 The real app needs a job that builds the edition every morning. It would search the news with Gemini grounding, extract the facts as JSON, and keep only the facts whose source appears in the grounding results. It would then match each fact to an existing story so the timeline grows, and store the result in Firestore. Cloud Scheduler would run it before breakfast.
+
+The real app would also take the odds from the public Kalshi and Polymarket APIs instead of the saved snapshot, so they are live.
