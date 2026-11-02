@@ -1,0 +1,8 @@
+{
+  "name": "Remix My news - Morning Brief",
+  "description": "A smart daily briefing app tracking news changes day-to-day, outlet coverage framing, and prediction scoreboards powered by Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
